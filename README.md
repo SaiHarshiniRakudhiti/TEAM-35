@@ -5,3 +5,10 @@ Globally, millions of individuals are affected by phobias, with approximately 10
 Solution:
 
 Develop an integrated app that harmoniously combines phobia management with comprehensive mental wellness resources. This app would offer personalized therapeutic interventions, mindfulness practices, developmental games, music, and meditation techniques, creating a holistic and accessible platform for enhancing overall mental well-being.
+
+About:
+this app has two divisions
+1-Mental illness
+2-Phobia
+
+1-Mental illness has ai chat and 
