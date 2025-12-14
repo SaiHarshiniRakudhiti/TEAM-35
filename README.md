@@ -32,3 +32,20 @@ My DIary
 Emergency Contacts
 Name 0f the Ai
 
+->moderate contains
+Daily tasks
+Daily monitoring
+Chat with Ai
+Talk with Ai
+doctor assistance
+Progress Reports
+My DIary
+Emergency Contacts
+Name 0f the Ai
+
+->seviour contains
+doctor assistance
+reports
+Progress Reports
+My DIary
+Emergency Contacts
