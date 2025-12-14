@@ -1,0 +1,261 @@
+---
+name: Mental Wellness AI Chat Workflow
+nodes:
+- parameters:
+    httpMethod: POST
+    path: mental-wellness-chat
+    responseMode: responseNode
+    options: {}
+  id: 8df6de95-26fd-4a1d-a55c-76f898cecdec
+  name: Webhook
+  type: n8n-nodes-base.webhook
+  typeVersion: 1.1
+  position:
+  - 1808
+  - 1456
+  webhookId: mental-wellness-chat
+- parameters:
+    agent: conversationalAgent
+    promptType: define
+    text: |
+      =You are a calm, supportive mental wellness AI assistant.
+
+      User message:
+      {{ $json.user_message }}
+
+      Detected emotion: {{ $json.emotion_state.emotion }}
+      Intensity: {{ $json.emotion_state.intensity }}
+
+      Respond with empathy.
+      Do not judge.
+      If intensity is high, be extra gentle and reassuring.
+      Keep the response short and human-like.
+    options:
+      systemMessage: You are a mental wellness AI companion focused on providing emotional
+        support, guided activities, and personalized recommendations for anxiety,
+        stress, depression, and phobia management.
+  id: d24c20a7-7fdf-4978-839a-1418b66c745d
+  name: AI Agent
+  type: "@n8n/n8n-nodes-langchain.agent"
+  typeVersion: 1.7
+  position:
+  - 2928
+  - 1552
+- parameters:
+    respondWith: json
+    responseBody: '={{ { "reply": $json.output } }}'
+    options: {}
+  id: fffaf40b-e31a-4ea8-ad94-8880669bdeeb
+  name: Respond to Webhook
+  type: n8n-nodes-base.respondToWebhook
+  typeVersion: 1.1
+  position:
+  - 3280
+  - 1552
+- parameters:
+    jsCode: |
+      // Get message safely from chat or webhook
+      const text =
+        $json.message ||
+        $json.body?.message ||
+        $json.chatInput ||
+        "";
+
+      // Default values
+      let emotion = "neutral";
+      let intensity = 0.2;
+
+      // Simple keyword-based emotion detection
+      if (text.toLowerCase().includes("stress")) {
+        emotion = "stress";
+        intensity = 0.8;
+      } else if (text.toLowerCase().includes("sad")) {
+        emotion = "sad";
+        intensity = 0.7;
+      } else if (text.toLowerCase().includes("angry")) {
+        emotion = "anger";
+        intensity = 0.75;
+      }
+
+      return {
+        user_message: text,
+        emotion_state: {
+          emotion,
+          intensity,
+          confidence: 0.6
+        }
+      };
+  type: n8n-nodes-base.code
+  typeVersion: 2
+  position:
+  - 2032
+  - 1552
+  id: babee154-7a15-4ad7-b39b-cff20f5ca740
+  name: Emotion Analyzer
+- parameters:
+    conditions:
+      options:
+        caseSensitive: true
+        leftValue: ''
+        typeValidation: loose
+        version: 3
+      conditions:
+      - id: 071b8c75-9a42-41ef-ad71-c9d0494f9aaa
+        leftValue: "={{ $json.emotion_state.intensity }}\n"
+        rightValue: 0.7
+        operator:
+          type: number
+          operation: equals
+      combinator: and
+    looseTypeValidation: true
+    options: {}
+  type: n8n-nodes-base.if
+  typeVersion: 2.3
+  position:
+  - 2256
+  - 1552
+  id: 3aa4b71f-c1e8-4bf2-8a62-5738828527f7
+  name: If
+- parameters:
+    conditions:
+      options:
+        caseSensitive: true
+        leftValue: ''
+        typeValidation: loose
+        version: 3
+      conditions:
+      - id: cf7395b9-5b22-48f9-8969-991095cb9bc3
+        leftValue: "={{ $json.emotion_state.intensity }}\n"
+        rightValue: 0.4
+        operator:
+          type: number
+          operation: equals
+      combinator: and
+    looseTypeValidation: true
+    options: {}
+  type: n8n-nodes-base.if
+  typeVersion: 2.3
+  position:
+  - 2496
+  - 1440
+  id: fcd5b370-dde0-40c8-8ef1-875df8bb07d7
+  name: If1
+- parameters:
+    conditions:
+      options:
+        caseSensitive: true
+        leftValue: ''
+        typeValidation: loose
+        version: 3
+      conditions:
+      - id: 1250fe96-6627-4440-bbe4-1272748a5233
+        leftValue: "={{ $json.emotion_state.intensity }}\n"
+        rightValue: 0.85
+        operator:
+          type: number
+          operation: equals
+      combinator: and
+    looseTypeValidation: true
+    options: {}
+  type: n8n-nodes-base.if
+  typeVersion: 2.3
+  position:
+  - 2720
+  - 1392
+  id: f4373b0a-a0cf-4d54-a56f-e4a14ff161a0
+  name: safety guard
+- parameters:
+    options: {}
+  type: "@n8n/n8n-nodes-langchain.chatTrigger"
+  typeVersion: 1.4
+  position:
+  - 1808
+  - 1648
+  id: 5e42ce38-a2a3-40d6-8a5a-b17740d292ef
+  name: When chat message received
+  webhookId: 9f5610ef-732d-4e1b-8163-76bfb5126474
+- parameters: {}
+  type: "@n8n/n8n-nodes-langchain.memoryBufferWindow"
+  typeVersion: 1.3
+  position:
+  - 3024
+  - 2016
+  id: fb63e8fe-2b3c-42c0-8c5f-83f47e7313b5
+  name: Simple Memory
+- parameters:
+    model:
+      __rl: true
+      mode: id
+      value: gpt-4o-mini
+    responsesApiEnabled: false
+    options: {}
+  id: cb747f73-4ea9-4bd2-ac2f-1e8ee350ce96
+  name: OpenAI Chat Model
+  type: "@n8n/n8n-nodes-langchain.lmChatOpenAi"
+  typeVersion: 1.3
+  position:
+  - 2912
+  - 1824
+  credentials:
+    openAiApi:
+      id: J6g4PsIMFl1Q3TY5
+      name: n8n free OpenAI API credits
+pinData: {}
+connections:
+  Webhook:
+    main:
+    - - node: Emotion Analyzer
+        type: main
+        index: 0
+  AI Agent:
+    main:
+    - - node: Respond to Webhook
+        type: main
+        index: 0
+  Emotion Analyzer:
+    main:
+    - - node: If
+        type: main
+        index: 0
+  If:
+    main:
+    - - node: If1
+        type: main
+        index: 0
+    - - node: AI Agent
+        type: main
+        index: 0
+  If1:
+    main:
+    - - node: safety guard
+        type: main
+        index: 0
+  safety guard:
+    main:
+    - - node: AI Agent
+        type: main
+        index: 0
+  When chat message received:
+    main:
+    - - node: Emotion Analyzer
+        type: main
+        index: 0
+  Simple Memory:
+    ai_memory:
+    - - node: AI Agent
+        type: ai_memory
+        index: 0
+  OpenAI Chat Model:
+    ai_languageModel:
+    - - node: AI Agent
+        type: ai_languageModel
+        index: 0
+active: true
+settings:
+  executionOrder: v1
+versionId: b9e4de37-cfea-4b77-bc50-891d1a9481f8
+meta:
+  templateCredsSetupCompleted: true
+  instanceId: f8d34184d562231152a062016d5e99ebe39b5ba2eb766ec6df8f6a85525d44c8
+id: ibE1WCaYoJwo8Zyc
+tags: []
