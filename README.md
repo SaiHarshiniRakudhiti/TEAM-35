@@ -8,7 +8,27 @@ Develop an integrated app that harmoniously combines phobia management with comp
 
 About:
 this app has two divisions
-1-Mental illness
+1-Mental wellness
 2-Phobia
 
-1-Mental illness has ai chat and 
+1-Mental wellness is automated by Ai
+it also contains:
+->Anxiety
+->stress
+->Depression
+by using Ai direct talk we can build a friendly conversation with user and we can cause of the problem.
+we also have a stress relief games to help the user.
+
+2-Phobia
+our phobia division will divide into 3 sections mild,moderate and seviour
+-> mild contains
+Daily tasks
+Daily monitoring
+Chat with Ai
+Talk with Ai
+Relation Practice
+Progress Reports
+My DIary
+Emergency Contacts
+Name 0f the Ai
+
